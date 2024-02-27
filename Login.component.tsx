@@ -15,21 +15,18 @@ interface LoginProps {
 const LoginComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { isLoggedIn, setIsLoggedIn, setProfile,profile,setLoader, isLoading, Toast } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn, setProfile,profile,setLoader, isLoading, Toast, setToken } = useContext(AuthContext);
   const navigation = useNavigation(); // Get navigation object
 
   const handleLogin = async () => {
     try {
       console.log("Email:", email);
       console.log("Password:", password);
-
       const token = await AuthService.login(email, password);
-      console.log("Login data saved securely!");
       const userDataResponse = await UserService.getProfile(token.access_token);
-      console.log("gotUserResponse",userDataResponse)
       setIsLoggedIn(true);
-
-      setProfile(userDataResponse)
+      setProfile(userDataResponse);
+      setToken(token);
       // @ts-ignore
       navigation.navigate("Profile", { userData: userDataResponse });
     } catch (err) {

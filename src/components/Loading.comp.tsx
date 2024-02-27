@@ -7,9 +7,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import LoginComponent from "../../Login.component";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Toast } from "toastify-react-native";
+import useLocation from "./Location.comp";
 const Stack = createStackNavigator();
 
 const Loading = ({ children }: { children: React.ReactNode }) => {
+
+  // const { location, errorMsg } = useLocation();
   const { isLoggedIn, setIsLoggedIn, setProfile, setLoader, isLoading,Toast } = useContext(AuthContext);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +41,7 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
       setLoader(false)
     }
   };
-console.log("LoadinUs",isLoggedIn,error)
+  // console.log("checkLocation",location)
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

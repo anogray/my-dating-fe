@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { AuthContext } from '../context/UserContext.context';
 import AuthService from '../utils/auth.service';
 import { useNavigation } from '@react-navigation/native';
+import useLocation from '../components/Location.comp';
 
 
 const styles = StyleSheet.create({
@@ -62,12 +63,12 @@ interface UserScreenProps {
 
 
 const Profile= (props:any) => {
+  const { location, errorMsg } = useLocation();
+
+  console.log("checkLocation",location)
 
   const navigation = useNavigation();
-  const { isLoggedIn,profile,Toast, setIsLoggedIn } = useContext(AuthContext);
-  console.log("UserScreenUs",props.route.params);
-  
-// Toast.success("YEs Profilw")
+  const { isLoggedIn,profile,Toast, setIsLoggedIn } = useContext(AuthContext);  
   const userData = profile?.id? profile : props.route.params.userData;
   const userInformation = [
     { key: 'Username', value: userData.username },
@@ -91,6 +92,11 @@ const Profile= (props:any) => {
     navigation.navigate('Login');
   }
 
+  const handleProfiles = ()=>{
+      //@ts-ignore
+      navigation.navigate('Profiles');
+  }
+
   const renderItem = ({ item }: { item: UserInformationItem }) => (
     <View style={styles.listItem}>
       <Text style={styles.listItemKey}>{item.key}:</Text>
@@ -101,6 +107,7 @@ const Profile= (props:any) => {
 
   return (
     <View style={styles.container}>
+      <Button title='Find someone' onPress={handleProfiles}/>
       <FlatList
         data={userInformation}
         renderItem={renderItem}
@@ -110,10 +117,6 @@ const Profile= (props:any) => {
     </View>
   );
 
-  return (<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Got into Profile screen</Text>
-        <Button title='Logout' onPress={handleLogout}/>
-      </View>)
 };
 
 

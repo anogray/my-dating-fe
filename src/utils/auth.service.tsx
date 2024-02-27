@@ -14,7 +14,6 @@ const AuthService = {
           'Accept': 'application/json'
         },
       });
-    //   const response = await axios.get(`https://jsonplaceholder.typicode.com/todos/1`);
       await SecureStore.setItemAsync('access_token', JSON.stringify(response.data.result.access_token));
 
       return {access_token:response.data.result.access_token};

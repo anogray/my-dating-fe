@@ -13,16 +13,46 @@ const UserService = {
           'Accept': 'application/json'
         },
       });
-    //   const response = await axios.get(`https://jsonplaceholder.typicode.com/todos/1`);
-      // await SecureStore.setItemAsync('access_token', JSON.stringify(response.data.result.access_token));
 
       return response.data.result;
-    } catch (error) {
+    } catch (err) {
       // Handle login errors
-      console.error('Error logging in:', error);
-      throw error; // Re-throw for further error handling
+      console.error('Error logging in:', err);
+      throw err; // Re-throw for further error handling
     }
   },
+
+  getProfiles: async(access_token:string)=>{
+    try{
+      const response = await axios.get(`${API_URL}/users/filter`, {
+        headers: {
+          Authorization:`Bearer ${access_token}`,
+          'Content-Type': 'application/json', 
+          'Accept': 'application/json'
+        },
+      });
+      return response.data.result;
+    }catch(err){
+      console.error('Error logging in:', err);
+      throw err;
+    }
+  },
+  
+  actionProfile : async(access_token:string, seen_user_id:string)=>{
+    try{
+      const response = await axios.post(`${API_URL}/users/action`,{seen_user_id, status:'REQUESTED'}, {
+        headers: {
+          Authorization:`Bearer ${access_token}`,
+          'Content-Type': 'application/json', 
+          'Accept': 'application/json'
+        },
+      });
+      return response.data.result;
+    }catch(err){
+      console.error('Error logging in:', err);
+      throw err;
+    }
+  }
   
 };
 

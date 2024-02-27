@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { AuthContext } from "../context/UserContext.context";
 import LoginComponent from "../../Login.component";
 import Profile from "../Screen/Profile.Screen";
+import Profiles from "../Screen/Profiles.Screen";
 import { View, Text } from "react-native";
 import UserService from "../utils/user.service";
 import * as SecureStore from "expo-secure-store";
@@ -20,6 +21,7 @@ const Routes = () => {
     isLoading,
     Toast,
     profile,
+    setToken
   } = useContext(AuthContext);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +39,7 @@ const Routes = () => {
         const userDataResponse = await UserService.getProfile(value);
         setIsLoggedIn(true);
         setProfile(userDataResponse);
+        setToken(value);
       }
     } catch (error) {
       console.log("Error retrieving Routes data:", error);
@@ -48,7 +51,6 @@ const Routes = () => {
     }
   };
 
-  console.log("RoutesUs", isLoggedIn, isLoading, profile.id);
 
   if (isLoading) {
     return (
@@ -68,11 +70,17 @@ const Routes = () => {
             />
           )}
           {isLoggedIn && profile && (
-            <Stack.Screen
-              name="Profile"
-              component={Profile}
-              initialParams={{ userData: profile }}
-            />
+            <>
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+                initialParams={{ userData: profile }}
+              />
+
+              <Stack.Screen name="Profiles" component={Profiles}
+              
+              />
+            </>
           )}
 
           <Stack.Screen

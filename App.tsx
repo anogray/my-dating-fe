@@ -32,11 +32,9 @@ export default function App() {
     <>
      
       <AuthProvider>
-        {/* <Loading> */}
           <View style={styles.container}>
             <Routes />
           </View>
-        {/* </Loading> */}
       </AuthProvider>
     </>
   );
