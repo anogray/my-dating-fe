@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
 
 export interface UserDataInterface {
   bio: string;
-  dateOfBirth: string;
+  age: string;
   dating_goal: string;
   education_level: string;
   email: string;
@@ -68,12 +68,12 @@ const Profile= (props:any) => {
   console.log("checkLocation",location)
 
   const navigation = useNavigation();
-  const { isLoggedIn,profile,Toast, setIsLoggedIn } = useContext(AuthContext);  
-  const userData = profile?.id? profile : props.route.params.userData;
-  const userInformation = [
+  const { isLoggedIn,profile,Toast, setIsLoggedIn,setProfile } = useContext(AuthContext);  
+  const userData = profile
+  const userInformation = userData && [
     { key: 'Username', value: userData.username },
     { key: 'Bio', value: userData.bio },
-    { key: 'Date of Birth', value: userData.dateOfBirth },
+    { key: 'Age', value: userData.age },
     { key: 'Dating Goal', value: userData.dating_goal },
     { key: 'Education Level', value: userData.education_level },
     { key: 'Email', value: userData.email },
@@ -88,6 +88,7 @@ const Profile= (props:any) => {
     await AuthService.logout();
     Toast.success('You have successfully logged out !')
     setIsLoggedIn(false)
+    setProfile(null)
      //@ts-ignore
     navigation.navigate('Login');
   }
@@ -96,6 +97,15 @@ const Profile= (props:any) => {
       //@ts-ignore
       navigation.navigate('Profiles');
   }
+
+  const handleEditProfile = () => {
+    try {
+      //@ts-ignore
+      navigation.navigate("EditProfileDetails",{ userData: profile });
+    } catch (err) {
+
+    }
+  };
 
   const renderItem = ({ item }: { item: UserInformationItem }) => (
     <View style={styles.listItem}>
@@ -108,12 +118,17 @@ const Profile= (props:any) => {
   return (
     <View style={styles.container}>
       <Button title='Find someone' onPress={handleProfiles}/>
-      <FlatList
+      {userData && <FlatList
         data={userInformation}
         renderItem={renderItem}
         keyExtractor={(item) => item.key}
-      />
+      />}
       <Button title='Logout' onPress={handleLogout}></Button>
+      <Button
+        title="Register"
+        onPress={handleEditProfile}
+        // style={[styles.button, styles.buttonHover]} // Apply hover style
+      />
     </View>
   );
 

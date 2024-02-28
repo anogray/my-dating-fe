@@ -6,7 +6,6 @@ import { ToastProvider } from "./src/components/Toaster.comp";
 import Loading from "./src/components/Loading.comp";
 import Routes from "./src/components/Routes.comp";
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -26,15 +25,14 @@ const styles = StyleSheet.create({
 });
 
 export default function App() {
-
-
   return (
     <>
-     
       <AuthProvider>
-          <View style={styles.container}>
+        <View style={styles.container}>
+          <Loading>
             <Routes />
-          </View>
+          </Loading>
+        </View>
       </AuthProvider>
     </>
   );

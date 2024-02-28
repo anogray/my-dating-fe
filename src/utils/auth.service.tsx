@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 // const API_URL = 'https://127.0.0.1:3000'; 
-const API_URL = 'https://8f17-2401-4900-1c89-60f9-9cb5-53cc-3481-37df.ngrok-free.app'; 
+const API_URL = ' https://b2b0-2401-4900-1c89-60f9-c90c-16d9-4eb1-4b62.ngrok-free.app'; 
 // const API_URL = 'localhost:3000'; 
 
 const AuthService = {

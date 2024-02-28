@@ -9,6 +9,7 @@ import { View, Text } from "react-native";
 import UserService from "../utils/user.service";
 import * as SecureStore from "expo-secure-store";
 import { ScreenOneCmp, ScreenTwoCmp } from "./Compos.comp";
+import EditProfileDetails from "../Screen/EditProfileDetails.Screen";
 
 const Stack = createStackNavigator();
 
@@ -21,9 +22,9 @@ const Routes = () => {
     isLoading,
     Toast,
     profile,
-    setToken
+    setToken,
   } = useContext(AuthContext);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMsg, setError] = useState<string | null>(null);
 
   useEffect(() => {
     retrieveData();
@@ -33,7 +34,7 @@ const Routes = () => {
     try {
       const value = JSON.parse(await SecureStore.getItemAsync("access_token"));
       // await SecureStore.deleteItemAsync("access_token")
-      console.log("usLoadedData", value);
+      console.log("usLoadedData retrieveData", value);
 
       if (value !== null) {
         const userDataResponse = await UserService.getProfile(value);
@@ -44,18 +45,23 @@ const Routes = () => {
     } catch (error) {
       console.log("Error retrieving Routes data:", error);
       // Toast.error(error)
-      // Toast.error(error)
       setError(`${error}`);
     } finally {
       setLoader(false);
     }
   };
 
-
+  console.log({ isLoggedIn, isLoading, profile }, isLoading || !profile?.id);
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading krle Bhai thodi...</Text>
+        <Text>Loading krle Bhai thodi Routes...</Text>
+      </View>
+    );
+  } else if (isLoggedIn && !profile) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading krle Bhai thodi Routes Profiles...</Text>
       </View>
     );
   } else {
@@ -63,37 +69,32 @@ const Routes = () => {
       <NavigationContainer>
         <Stack.Navigator>
           {!isLoggedIn && (
-            <Stack.Screen
-              name="Login"
-              component={LoginComponent}
-              options={{ headerShown: false }}
-            />
+            <>
+              <Stack.Screen
+                name="Login"
+                component={LoginComponent}
+                options={{ headerShown: false }}
+              />
+            </>
           )}
           {isLoggedIn && profile && (
             <>
               <Stack.Screen
                 name="Profile"
                 component={Profile}
-                initialParams={{ userData: profile }}
+                // initialParams={{ userData: profile }}
               />
 
-              <Stack.Screen name="Profiles" component={Profiles}
-              
+              <Stack.Screen
+                name="EditProfileDetails"
+                component={EditProfileDetails}
+                options={{ headerTitle: "Update your profile" }}
+                // initialParams={{ userData: profile }}
               />
+
+              <Stack.Screen name="Profiles" component={Profiles} />
             </>
           )}
-
-          <Stack.Screen
-            name="Screenone"
-            component={ScreenOneCmp}
-            options={{ headerShown: false }}
-          />
-
-          <Stack.Screen
-            name="Screentwo"
-            component={ScreenTwoCmp}
-            options={{ headerShown: false }}
-          />
         </Stack.Navigator>
       </NavigationContainer>
     );

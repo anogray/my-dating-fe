@@ -24,12 +24,14 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
     try {
       const value = JSON.parse(await SecureStore.getItemAsync("access_token"));
       // await SecureStore.deleteItemAsync("access_token")
-      console.log("usLoadedData",value)
+      console.log("usLoadedData Loading",isLoading,value)
      
       if (value !== null) {
         const userDataResponse = await UserService.getProfile(value);
         setIsLoggedIn(true);
         setProfile(userDataResponse);
+      }else{
+        throw Error('Not token present')
       }
     } catch (error) {
       console.log("Error retrieving data:", error);
@@ -39,6 +41,7 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
     }
     finally{
       setLoader(false)
+      setIsLoggedIn(false);
     }
   };
   // console.log("checkLocation",location)
@@ -48,20 +51,21 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
         <Text>Loading krle Bhai thodi...</Text>
       </View>
     );
-  } else if (error) {
-    console.log("CheckCheck",error)
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Login"
-            component={LoginComponent}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  } 
+  }
+  //  else if (error) {
+  //   console.log("CheckCheck",error)
+  //   return (
+  //     <NavigationContainer>
+  //       <Stack.Navigator>
+  //         <Stack.Screen
+  //           name="Login"
+  //           component={LoginComponent}
+  //           options={{ headerShown: false }}
+  //         />
+  //       </Stack.Navigator>
+  //     </NavigationContainer>
+  //   );
+  // } 
   else {
     return <>{children}</>;
   }
