@@ -1,10 +1,10 @@
 import { View, Text, TouchableOpacity } from "react-native";
 
 const datingGoals = [
-  { label: 'Long Term Partner', value: 'LONG_TERM_PARTNER' },
-  { label: 'Short Term Relationship', value: 'SHORT_TERM_RELATIONSHIP' },
-  { label: 'New Friends', value: 'NEW_FRIENDS' },
-  { label: 'Still Figuring Out', value: 'STILL_FIGURING_OUT' },
+  { label: 'Long Term Partner', value: 'Long Term Partner' },
+  { label: 'Short Term Relationship', value: 'Short Term Relationship' },
+  { label: 'New Friends', value: 'New Friends' },
+  { label: 'Still Figuring Out', value: 'Still Figuring Out' },
 ];
 
 const DatingGoalPicker = ({ value, onChange }) => {

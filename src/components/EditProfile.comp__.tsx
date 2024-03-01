@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -23,15 +23,10 @@ import { AuthContext } from "../context/UserContext.context";
 import LoaderAnimation from "./Loader.comp";
 import { useNavigation } from "@react-navigation/native";
 // import { launchImageLibrary } from "react-native-image-picker";
-import * as ImagePickerFile from "react-native-image-picker";
-import ReactNativeBlobUtil from "react-native-blob-util";
-
-import * as FileSystem from "expo-file-system";
-// import RNFetchBlob from "rn-fetch-blob";
-// import RNFS from 'react-native-fs';
+// import FileSystem from "expo-file-system";
 // import RNFS from "react-native-fs";
-// import {fs} from 'react-native-fetch-blob'
-import RNFetchBlob from "react-native-fetch-blob";
+
+
 const styles = StyleSheet.create({
   container: {
     marginTop: 100,
@@ -71,9 +66,22 @@ const EditProfile = ({ userData }) => {
   const { token, setProfile } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  // const [formData, setFormData] = useState( {
+  //   yearOfBirth: null,
+  //   gender: null,
+  //   location: "",
+  //   images: null,
+  //   bio: "",
+  //   educationLevel: "",
+  //   datingGoal: "",
+  //   interests: [],
+  //   languages: [],
+  //   height: "",
+  //   age: null,
+  // });
 
   const [formData, setFormData] = useState({ ...userData });
-  const [fileUri, setfileUri] = useState("");
+  const [image, setImage] = useState(null);
 
   const handleInputChange = (field, value) => {
     if (field === "yearOfBirth") {
@@ -100,69 +108,91 @@ const EditProfile = ({ userData }) => {
     }
   };
 
-  useEffect(() => {
-    if (fileUri) {
-      handleImagePost();
-    }
-  }, [fileUri]);
+  console.log("EditProfile formData", formData.images);
 
   const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0,
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log("pickImage", result);
+    if (!result.cancelled) {
+      // setImage( {name: `${userData.id}_image`,
+      // type: result.assets[0].type,
+      // mimeType:result.assets[0].mimeType,
+      // uri: Platform.OS === 'ios' ? result.assets[0].uri.replace('file://', '') : result.assets[0].uri})
+      const imageUri =
+        Platform.OS === "ios"
+          ? result.assets[0].uri.replace("file://", "")
+          : result.assets[0].uri;
+          const fileInfo = await FileSystem.getInfoAsync(imageUri);
+          const fileUri = fileInfo.uri;
+          const fileBuffer = await FileSystem.readAsStringAsync(fileUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          setImage({
+        name: `${userData.id}_image`,
+        type: result.assets[0].type,
+        uri: imageUri,
+        buffer: fileBuffer,
       });
-
-      if (result) {
-        const fileUri =
-          Platform.OS === "ios"
-            ? result.assets[0].uri.replace("file://", "")
-            : result.assets[0].uri;
-
-        setfileUri(fileUri);
-      }
-    } catch (err) {
-      console.log("pickImageErr", err);
-      setfileUri(fileUri);
     }
   };
 
-  const handleImagePost = async () => {
+  // const pickImage = async () => {
+
+  //   launchImageLibrary({ noData: true }, (response) => {
+  //     console.log("launchImageLibrary",response);
+  //     if (response) {
+  //       setImage(response);
+  //     }
+  //   });
+
+  //   const data = new FormData();
+
+  //   // data.append("photo", {
+  //   //   name: photo.fileName,
+  //   //   type: photo.type,
+  //   //   uri: Platform.OS === "ios" ? photo.uri.replace("file://", "") : photo.uri,
+  //   // });
+  //   // console.log("pickImage", result);
+  //   // if (!result.cancelled) {
+  //   //   setImage(result.assets[0].uri);
+  //   // }
+  // };
+
+  const handleImageSubmit = async () => {
     try {
       setLoading(true);
-      const result = await UserService.addImage(token, fileUri);
-      setProfile({ ...result });
-      setFormData({ ...result });
+      const formData = new FormData();
+      formData.append("images", image.buffer);
+      console.log("handleImageSubmit", image.type);
+      // sendFormData.append(`${key}[${index}]`, item);
+      const response = await UserService.updateProfile(
+        token,
+        userData.id,
+        formData
+      );
+      console.log("Image Uploaded", response);
+      setProfile(response);
+      setImage(null); // Reset image state after upload
     } catch (err) {
-      console.log("handleImagePost Err", err);
+      console.log("handleImageSubmit Error", err);
     } finally {
       setLoading(false);
-      setfileUri("");
     }
   };
 
-  const removeImage = async (index: number) => {
-    try {
-      const newImages = [...formData.images];
-      setLoading(true);
-      const result = await UserService.removeImage(token, newImages[index]);
-      console.log("removeImage result", result);
-      newImages.splice(index, 1);
-      setFormData({
-        ...formData,
-        images: newImages,
-      });
-      setProfile({
-        ...formData,
-        images: newImages,
-      });
-    } catch (err) {
-      console.log("removeImage Err : ", err);
-    } finally {
-      setLoading(false);
-    }
+  const removeImage = (index) => {
+    const newImages = [...formData.images];
+    newImages.splice(index, 1);
+    setFormData({
+      ...formData,
+      images: newImages,
+    });
   };
 
   const handleSubmit = async () => {
@@ -216,12 +246,16 @@ const EditProfile = ({ userData }) => {
         });
 
         setLoading(true);
-        const response = await UserService.updateProfile(token, sendFormData);
+        const response = await UserService.updateProfile(
+          token,
+          userData.id,
+          sendFormData
+        );
         console.log("Responded", response);
         setProfile(response);
       }
       //@ts-ignore
-      // navigation.navigate("Profile");
+      navigation.navigate("Profile");
     } catch (err) {
       console.log("handleSubmit Error", err);
     } finally {
@@ -256,21 +290,22 @@ const EditProfile = ({ userData }) => {
           />
         </View>
 
-        <View style={styles.section}>
-          <Button title="Upload Image" onPress={pickImage} />
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {formData.images.map((image, index) => (
-              <View key={index}>
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 100, height: 100, margin: 5 }}
-                />
-                <TouchableOpacity onPress={() => removeImage(index)}>
-                  <Text>Remove</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+        <TouchableOpacity onPress={pickImage}>
+          <Text>Choose Profile Picture</Text>
+        </TouchableOpacity>
+        <Button title="Upload Image" onPress={handleImageSubmit} />
+        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          {formData.images.map((image, index) => (
+            <View key={index}>
+              <Image
+                source={{ uri: image }}
+                style={{ width: 100, height: 100, margin: 5 }}
+              />
+              <TouchableOpacity onPress={() => removeImage(index)}>
+                <Text>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
 
         <View style={styles.section}>

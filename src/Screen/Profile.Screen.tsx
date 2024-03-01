@@ -125,7 +125,7 @@ const Profile= (props:any) => {
       />}
       <Button title='Logout' onPress={handleLogout}></Button>
       <Button
-        title="Register"
+        title="Edit"
         onPress={handleEditProfile}
         // style={[styles.button, styles.buttonHover]} // Apply hover style
       />

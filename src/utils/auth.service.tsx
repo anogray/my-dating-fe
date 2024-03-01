@@ -1,8 +1,8 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 // const API_URL = 'https://127.0.0.1:3000'; 
-const API_URL = ' https://b2b0-2401-4900-1c89-60f9-c90c-16d9-4eb1-4b62.ngrok-free.app'; 
-// const API_URL = 'localhost:3000'; 
+// const API_URL = 'https://6bf6-2401-4900-1c75-a279-9c7c-77d5-b7bf-dd4d.ngrok-free.app'; 
+const API_URL = process.env.EXPO_PUBLIC_BACKEND; 
 
 const AuthService = {
   login: async (email:string, password:string) => {
@@ -19,7 +19,7 @@ const AuthService = {
       return {access_token:response.data.result.access_token};
     } catch (error) {
       // Handle login errors
-      // console.error(error?.response?.data?.message);
+      console.error(error);
       throw error?.response?.data?.message; // Re-throw for further error handling
     }
   },
