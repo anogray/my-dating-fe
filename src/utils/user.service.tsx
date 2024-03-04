@@ -34,6 +34,7 @@ const UserService = {
           Accept: "application/json",
         },
       });
+      console.log("getProfilesResp",response.data.result)
       return response.data.result;
     } catch (err) {
       console.error("Error getProfiles in:", err?.response);
@@ -41,11 +42,11 @@ const UserService = {
     }
   },
 
-  actionProfile: async (access_token: string, seen_user_id: string) => {
+  actionProfile: async (access_token: string, userId: string, actionType:string) => {
     try {
       const response = await axios.post(
         `${API_URL}/users/action`,
-        { seen_user_id, status: "REQUESTED" },
+        { userId, status: actionType },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -61,7 +62,7 @@ const UserService = {
     }
   },
 
-  updateProfile: async (access_token, formData) => {
+  updateProfile: async (access_token: string, formData: string) => {
     try {
       const response = await axios.patch(`${API_URL}/users`, formData, {
         headers: {
@@ -69,7 +70,6 @@ const UserService = {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("seeeeeee", response.data);
       return response.data.result;
     } catch (err) {
       // console.error('Error updateProfile in:', err?.response?.data?.response?.message);
@@ -110,12 +110,27 @@ const UserService = {
           "Content-Type": "application/json",
         },
       });
-      console.log("seeeeeee", response);      
       return true
     } catch (error) {
       console.log("removeImage error", error);
     }
   },
+
+  registerUser:async (userDetails:any) => {
+    try{
+      console.log("registerUser Service",userDetails)
+      const response = await axios.post(`${API_URL}/users/register`, userDetails, {
+        headers: {
+          // Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data
+    }catch(err){
+      throw err;
+    }
+    
+  }
 };
 
 export default UserService;

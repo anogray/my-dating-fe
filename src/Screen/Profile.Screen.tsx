@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { AuthContext } from '../context/UserContext.context';
 import AuthService from '../utils/auth.service';
 import { useNavigation } from '@react-navigation/native';
-import useLocation from '../components/Location.comp';
+import useLocation, { useLocationContext } from '../components/Location.comp';
+import UserService from '../utils/user.service';
 
 
 const styles = StyleSheet.create({
@@ -22,6 +23,10 @@ const styles = StyleSheet.create({
   listItemKey: {
     fontWeight: 'bold',
   },
+  mandatoryItemKey: {
+    fontWeight: 'bold',
+    color:'red'
+  },
   listItemValue: {
     // Add any styles for the value text here
   },
@@ -34,6 +39,7 @@ const styles = StyleSheet.create({
 export interface UserDataInterface {
   bio: string;
   age: string;
+  yob:string,
   dating_goal: string;
   education_level: string;
   email: string;
@@ -48,7 +54,7 @@ export interface UserDataInterface {
   longitude: number;
   password: string; // Consider removing for security reasons
   profilePicture: string;
-  username: string;
+  // username: string;
 }
 
 interface UserInformationItem {
@@ -63,17 +69,14 @@ interface UserScreenProps {
 
 
 const Profile= (props:any) => {
-  const { location, errorMsg } = useLocation();
-
-  console.log("checkLocation",location)
-
+  const { location, errorMsg  } = useLocationContext()
   const navigation = useNavigation();
-  const { isLoggedIn,profile,Toast, setIsLoggedIn,setProfile } = useContext(AuthContext);  
+  const { isLoggedIn,profile,Toast, setIsLoggedIn,setProfile,token } = useContext(AuthContext);  
   const userData = profile
   const userInformation = userData && [
-    { key: 'Username', value: userData.username },
+    // { key: 'Username', value: userData.username },
     { key: 'Bio', value: userData.bio },
-    { key: 'Age', value: userData.age },
+    { key: 'Yob', value: userData.yob },
     { key: 'Dating Goal', value: userData.dating_goal },
     { key: 'Education Level', value: userData.education_level },
     { key: 'Email', value: userData.email },
@@ -95,7 +98,11 @@ const Profile= (props:any) => {
 
   const handleProfiles = ()=>{
       //@ts-ignore
-      navigation.navigate('Profiles');
+      if(!profile.yob){
+        Toast.warn('Please tell us your birth year');
+      }else{
+        navigation.navigate('Profiles');
+      }
   }
 
   const handleEditProfile = () => {
@@ -107,13 +114,32 @@ const Profile= (props:any) => {
     }
   };
 
-  const renderItem = ({ item }: { item: UserInformationItem }) => (
-    <View style={styles.listItem}>
-      <Text style={styles.listItemKey}>{item.key}:</Text>
-      <Text style={styles.listItemValue}>{item.value}</Text>
-    </View>
-    
-  );
+  const renderItem = ({ item }: { item: UserInformationItem }) => {
+    return (
+      <View style={styles.listItem}>
+        {item.key=='Yob' && !item.value ? <Text style={styles.mandatoryItemKey}>*{item.key}:</Text>:<Text style={styles.listItemKey}>{item.key}:</Text>}
+        <Text style={styles.listItemValue}>{item.value}</Text>
+      </View>
+      
+    );
+  }
+
+  const updateLocation = async()=>{
+    try{
+        const formData = new FormData();
+        formData.append('longitude',location.coords.longitude)
+        formData.append('latitude',location.coords.latitude);
+        const response = await UserService.updateProfile(token, formData);
+    }catch(err){
+      console.log("updateLocation Err",err);
+    }
+  }
+  useEffect(()=>{
+
+   if(location){
+    updateLocation();
+   }
+  },[location])
 
   return (
     <View style={styles.container}>

@@ -10,6 +10,7 @@ import UserService from "../utils/user.service";
 import * as SecureStore from "expo-secure-store";
 import { ScreenOneCmp, ScreenTwoCmp } from "./Compos.comp";
 import EditProfileDetails from "../Screen/EditProfileDetails.Screen";
+import RegisterComp from "./Register.comp";
 
 const Stack = createStackNavigator();
 
@@ -75,6 +76,11 @@ const Routes = () => {
                 component={LoginComponent}
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="Register"
+                component={RegisterComp}
+                options={{ headerShown: false }}
+              />
             </>
           )}
           {isLoggedIn && profile && (
@@ -92,7 +98,7 @@ const Routes = () => {
                 // initialParams={{ userData: profile }}
               />
 
-              <Stack.Screen name="Profiles" component={Profiles} />
+             { profile.yob && <Stack.Screen name="Profiles" component={Profiles} />}
             </>
           )}
         </Stack.Navigator>

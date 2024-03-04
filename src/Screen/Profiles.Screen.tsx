@@ -8,7 +8,7 @@ const ProfileCardDetails = ({item}) => {
   return (
         <View key={item.id}>
           <Text>Id: {item.id}</Text>
-          <Text>Username: {item.username }</Text>
+          {/* <Text>Username: {item.username }</Text> */}
           <Text>Email: {item.email}</Text>
           <Text>
             Date of Birth: {item.dateOfBirth}
@@ -69,17 +69,33 @@ const Profiles = () => {
     }
   };
 
-  const handleReject = () => {
+  const handleReject = async(id:string) => {
     // Implement reject logic here
     // For example, you can simply remove the current profile
-    setProfileCards(profileCards.slice(1));
+    try{
+      const response = await UserService.actionProfile(token,String(id),'REJECTED')
+      setProfileCards(profileCards.slice(1));
+      if(profileCards.length==1){
+        // setLoading(true);
+        // getProfiles();
+      }  
+
+    }catch(err){
+      console.log("handleReject",err)
+    }
   };
 
-  const handleLike = () => {
-    setProfileCards(profileCards.slice(1));
-    if(profileCards.length==1){
-      setLoading(true);
-      getProfiles();
+  const handleLike = async(id:string) => {
+
+    try{
+      const response = await UserService.actionProfile(token,String(id),'LIKED')
+      setProfileCards(profileCards.slice(1));
+      if(profileCards.length==1){
+        // setLoading(true);
+        // getProfiles();
+      }
+    }catch(err){
+      console.log("handleLike",err)
     }
   };
 
@@ -103,8 +119,8 @@ const Profiles = () => {
       <View>
         <ProfileCardDetails item={currentProfile} />
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-          <Button title="Reject" onPress={handleReject} />
-          <Button title="Like" onPress={handleLike} />
+          <Button title="Reject" onPress={()=>handleReject(currentProfile.id)} />
+          <Button title="Like" onPress={()=>handleLike(currentProfile.id)} />
         </View>
       </View>
     </View>

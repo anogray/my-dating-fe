@@ -73,7 +73,7 @@ const LoginComponent = () => {
   const handleRegister = () => {
     try {
       //@ts-ignore
-      navigation.navigate("EditProfileDetails");
+      navigation.navigate("Register");
     } catch (err) {}
   };
 
@@ -103,11 +103,11 @@ const LoginComponent = () => {
         onPress={handleLogin}
         // style={[styles.button, styles.buttonHover]} // Apply hover style
       />
-      {/* <Button
+      <Button
         title="Register"
         onPress={handleRegister}
         // style={[styles.button, styles.buttonHover]} // Apply hover style
-      /> */}
+      />
     </View>
   );
 };

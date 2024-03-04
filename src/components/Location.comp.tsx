@@ -1,26 +1,39 @@
-import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 
-const useLocation = () => {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+interface LocationContextType {
+  location: {};
+  errorMsg:  null;
+}
+
+const LocationContext = createContext<LocationContextType>({
+  location: {},
+  errorMsg: null,
+});
+
+export const useLocationContext = () => useContext(LocationContext);
+
+export const LocationProvider = ({ children }:any) => {
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      let locationPermission = await Location.requestForegroundPermissionsAsync();
+      console.log({locationPermission})
+      if (locationPermission.status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      let locationObj = await Location.getCurrentPositionAsync({});
+      setLocation(locationObj);
     })();
   }, []);
 
-  return { location, errorMsg };
+  return (
+    <LocationContext.Provider value={{ location, errorMsg }}>
+      {children}
+    </LocationContext.Provider>
+  );
 };
-
-export default useLocation;

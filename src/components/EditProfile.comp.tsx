@@ -32,6 +32,7 @@ import * as FileSystem from "expo-file-system";
 // import RNFS from "react-native-fs";
 // import {fs} from 'react-native-fetch-blob'
 import RNFetchBlob from "react-native-fetch-blob";
+import { useLocationContext } from "./Location.comp";
 const styles = StyleSheet.create({
   container: {
     marginTop: 100,
@@ -68,29 +69,40 @@ const styles = StyleSheet.create({
 });
 
 const EditProfile = ({ userData }) => {
+
+  console.log("EditProfile",!userData.yob,userData.yob)
   const { token, setProfile } = useContext(AuthContext);
+  const { location, errorMsg  } = useLocationContext();
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-
   const [formData, setFormData] = useState({ ...userData });
   const [fileUri, setfileUri] = useState("");
 
   const handleInputChange = (field, value) => {
     if (field === "yearOfBirth") {
+
+      if (value.length < 4) {
+        setFormData({
+          ...formData,
+          yob: value,
+        });
+        return;
+      }
       const today = new Date();
       const birthYear = parseInt(value, 10);
       let age = today.getFullYear() - birthYear;
+      console.log("yearOfBirthChange",age)
       if (age < 18) {
         Toast.warn("Only 18+ users are allowed");
         setFormData({
           ...formData,
-          age: null,
+          yob: null,
         });
         return;
       }
       setFormData({
         ...formData,
-        age: age,
+        yob: birthYear,
       });
     } else {
       setFormData({
@@ -214,11 +226,13 @@ const EditProfile = ({ userData }) => {
             }
           }
         });
+       
 
         setLoading(true);
         const response = await UserService.updateProfile(token, sendFormData);
         console.log("Responded", response);
-        setProfile(response);
+        setProfile({...response});
+        setFormData({ ...response });
       }
       //@ts-ignore
       // navigation.navigate("Profile");
@@ -236,17 +250,19 @@ const EditProfile = ({ userData }) => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
-        <View style={styles.section}>
+        {!userData.yob &&
+          <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            {formData.age ? "Age" : "Year of Birth"}
+            *Year of Birth
           </Text>
           <TextInput
             placeholder="YYYY"
             keyboardType="numeric"
-            value={formData.age ? formData.age.toString() : null}
+            value={formData.yob ? formData.yob.toString() : null}
             onChangeText={(value) => handleInputChange("yearOfBirth", value)}
           />
         </View>
+        }
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Gender</Text>
@@ -323,7 +339,7 @@ const EditProfile = ({ userData }) => {
           <Text style={styles.sectionTitle}>Height (in cm)</Text>
           <TextInput
             keyboardType="numeric"
-            value={formData.height.toString()}
+            value={formData.height ? formData.height.toString() : null}
             onChangeText={(value) => handleInputChange("height", value)}
           />
         </View>
@@ -331,7 +347,7 @@ const EditProfile = ({ userData }) => {
         <Button
           title="Save"
           onPress={handleSubmit}
-          disabled={!formData.age || !formData.gender}
+          disabled={!formData.yob || !formData.gender}
         />
       </View>
     </ScrollView>

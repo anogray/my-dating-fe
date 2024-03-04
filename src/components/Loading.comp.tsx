@@ -7,12 +7,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import LoginComponent from "../../Login.component";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Toast } from "toastify-react-native";
-import useLocation from "./Location.comp";
+// import useLocation from "./Location.comp";
+import * as Location from 'expo-location';
+import { useLocationContext } from "./Location.comp";
+
 const Stack = createStackNavigator();
 
 const Loading = ({ children }: { children: React.ReactNode }) => {
 
-  // const { location, errorMsg } = useLocation();
+  // const { location, errorMsg } = useLocationContext();
+  const { location, errorMsg  } = useLocationContext()
+
   const { isLoggedIn, setIsLoggedIn, setProfile, setLoader, isLoading,Toast } = useContext(AuthContext);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,11 +49,19 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
       setIsLoggedIn(false);
     }
   };
-  // console.log("checkLocation",location)
+  console.log("checkLocationContext",location,errorMsg)
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Loading krle Bhai thodi...</Text>
+      </View>
+    );
+  }
+
+  if(errorMsg){
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Allow location in settings before to use the app</Text>
       </View>
     );
   }
