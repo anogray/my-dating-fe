@@ -11,6 +11,7 @@ import * as SecureStore from "expo-secure-store";
 import { ScreenOneCmp, ScreenTwoCmp } from "./Compos.comp";
 import EditProfileDetails from "../Screen/EditProfileDetails.Screen";
 import RegisterComp from "./Register.comp";
+import ChatBox from "../Screen/ChatBox.Screen";
 
 const Stack = createStackNavigator();
 
@@ -33,6 +34,7 @@ const Routes = () => {
 
   const retrieveData = async () => {
     try {
+      //@ts-ignore
       const value = JSON.parse(await SecureStore.getItemAsync("access_token"));
       // await SecureStore.deleteItemAsync("access_token")
       console.log("usLoadedData retrieveData", value);
@@ -99,6 +101,14 @@ const Routes = () => {
               />
 
              { profile.yob && <Stack.Screen name="Profiles" component={Profiles} />}
+
+             <Stack.Screen
+                name="ChatBox"
+                component={ChatBox}
+                options={{ headerTitle: "Chats" }}
+                // initialParams={{ userData: profile }}
+              />
+
             </>
           )}
         </Stack.Navigator>

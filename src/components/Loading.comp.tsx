@@ -49,7 +49,7 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
       setIsLoggedIn(false);
     }
   };
-  console.log("checkLocationContext",location,errorMsg)
+  // console.log("checkLocationContext",location,errorMsg)
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

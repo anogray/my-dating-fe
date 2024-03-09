@@ -130,7 +130,28 @@ const UserService = {
       throw err;
     }
     
-  }
+  },
+
+  userChats: async(access_token: string, page:number=1, limit:number=1)=>{
+    try{
+
+      const response = await axios.get(`${API_URL}/users/chats`, {
+        params: {
+          page,
+          limit
+        },
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("userChats response");
+      return response.data.result;
+    }catch(err){
+      
+      console.log("userChats err",err)
+    }
+  },
 };
 
 export default UserService;

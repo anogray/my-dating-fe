@@ -114,6 +114,15 @@ const Profile= (props:any) => {
     }
   };
 
+  const handleChats= () => {
+    try {
+      //@ts-ignore
+      navigation.navigate("ChatBox");
+    } catch (err) {
+
+    }
+  };
+
   const renderItem = ({ item }: { item: UserInformationItem }) => {
     return (
       <View style={styles.listItem}>
@@ -149,6 +158,7 @@ const Profile= (props:any) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.key}
       />}
+      <Button title='Chats' onPress={handleChats}></Button>
       <Button title='Logout' onPress={handleLogout}></Button>
       <Button
         title="Edit"
