@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
 
 const EditProfile = ({ userData }) => {
 
-  console.log("EditProfile",!userData.yob,userData.yob)
   const { token, setProfile } = useContext(AuthContext);
   const { location, errorMsg  } = useLocationContext();
   const [loading, setLoading] = useState(false);
@@ -91,7 +90,6 @@ const EditProfile = ({ userData }) => {
       const today = new Date();
       const birthYear = parseInt(value, 10);
       let age = today.getFullYear() - birthYear;
-      console.log("yearOfBirthChange",age)
       if (age < 18) {
         Toast.warn("Only 18+ users are allowed");
         setFormData({
@@ -136,7 +134,6 @@ const EditProfile = ({ userData }) => {
         setfileUri(fileUri);
       }
     } catch (err) {
-      console.log("pickImageErr", err);
       setfileUri(fileUri);
     }
   };
@@ -160,7 +157,6 @@ const EditProfile = ({ userData }) => {
       const newImages = [...formData.images];
       setLoading(true);
       const result = await UserService.removeImage(token, newImages[index]);
-      console.log("removeImage result", result);
       newImages.splice(index, 1);
       setFormData({
         ...formData,
@@ -208,7 +204,6 @@ const EditProfile = ({ userData }) => {
         // Send filteredFormData to the server
       }
 
-      console.log("handlingSubmit", filteredFormData);
 
       if (Object.keys(filteredFormData).length > 0) {
         const sendFormData = new FormData();
@@ -230,7 +225,6 @@ const EditProfile = ({ userData }) => {
 
         setLoading(true);
         const response = await UserService.updateProfile(token, sendFormData);
-        console.log("Responded", response);
         setProfile({...response});
         setFormData({ ...response });
       }

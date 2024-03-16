@@ -152,6 +152,44 @@ const UserService = {
       console.log("userChats err",err)
     }
   },
+
+  userChatBox: async(access_token: string, id:string, page:number=1, limit:number=1)=>{
+    try{
+
+      const response = await axios.get(`${API_URL}/users/chat/${id}`, {
+        params: {
+          page,
+          limit
+        },
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("userChatBox response");
+      return response.data.result;
+    }catch(err){
+      
+      console.log("userChatBox err",err)
+    }
+  },
+
+  postMessage: async(access_token: string, id:string, message:string)=>{
+    try{
+
+      const response = await axios.post(`${API_URL}/users/chat/send`, {recipientId:id, content:message}, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("postMessage response");
+      return response.data.result;
+    }catch(err){
+      
+      console.log("postMessage err",err)
+    }
+  }
 };
 
 export default UserService;

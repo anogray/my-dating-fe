@@ -11,8 +11,7 @@ const ChatBox = ()=>{
   const { profile } = useContext(AuthContext);
 
 
-    return (<View style={{ flex: 1, marginLeft:10, marginRight:10  }}>
-        {/* <Button title='Login' onPress={handleLogin}></Button> */}
+    return (<View style={{ flex: 1 }}>
         <UserChats/>
       </View>)
 }

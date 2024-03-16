@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import UserService from "../utils/user.service";
 import { AuthContext } from "../context/UserContext.context";
+import { useNavigation } from "@react-navigation/native";
 
 
 const styles = StyleSheet.create({
@@ -16,9 +17,9 @@ const styles = StyleSheet.create({
     userListItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 15,
+      marginBottom: -2,
       padding: 10,
-      backgroundColor: '#f5f5f5',
+      // backgroundColor: 'lightgray',
       borderRadius: 5,
     },
     userImageContainer: {
@@ -42,10 +43,11 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
     },
-  });
+});
   
 const UserChats = ()=>{
 
+  const navigation = useNavigation();
     const { token, setProfile } = useContext(AuthContext);
     const [pageConfig,setPageConfig] = useState({page:1,limit:20});
     const [usersProfiles, setUsersProfiles] = useState([]);
@@ -54,13 +56,11 @@ const UserChats = ()=>{
         getUserProfiles();
     },[])
 
-    console.log({usersProfiles})
     
     const getUserProfiles = async()=>{
         try{
 
         const response = await UserService.userChats(token, pageConfig.page, pageConfig.limit);
-        console.log("getUserProfiles",response)
         setPageConfig((prev)=>{return {...prev,page:response.page}})
         setUsersProfiles(response.users)
         }catch(err){
@@ -70,7 +70,8 @@ const UserChats = ()=>{
 
     const handleUserClick = (user) => {
         // Handle navigation or other actions on user click
-        console.log('User clicked:', user);
+        //@ts-ignore
+        navigation.navigate("UserChat",{...user, id:user.id});
         // You can navigate to another screen using a navigation library (e.g., react-navigation)
         // or pass user data as props to another component
       };

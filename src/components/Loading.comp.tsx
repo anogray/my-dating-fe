@@ -29,7 +29,7 @@ const Loading = ({ children }: { children: React.ReactNode }) => {
     try {
       const value = JSON.parse(await SecureStore.getItemAsync("access_token"));
       // await SecureStore.deleteItemAsync("access_token")
-      console.log("usLoadedData Loading",isLoading,value)
+      // console.log("usLoadedData Loading",isLoading,value)
      
       if (value !== null) {
         const userDataResponse = await UserService.getProfile(value);

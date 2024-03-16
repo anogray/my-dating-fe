@@ -11,7 +11,9 @@ import * as SecureStore from "expo-secure-store";
 import { ScreenOneCmp, ScreenTwoCmp } from "./Compos.comp";
 import EditProfileDetails from "../Screen/EditProfileDetails.Screen";
 import RegisterComp from "./Register.comp";
-import ChatBox from "../Screen/ChatBox.Screen";
+import ChatBox from "../Screen/Chats.Screen";
+import UserChat from "../Screen/UserChat.Screen";
+import UserChatHeader from "./UserChatHeader.comp";
 
 const Stack = createStackNavigator();
 
@@ -37,7 +39,7 @@ const Routes = () => {
       //@ts-ignore
       const value = JSON.parse(await SecureStore.getItemAsync("access_token"));
       // await SecureStore.deleteItemAsync("access_token")
-      console.log("usLoadedData retrieveData", value);
+      // console.log("usLoadedData retrieveData", value);
 
       if (value !== null) {
         const userDataResponse = await UserService.getProfile(value);
@@ -54,7 +56,6 @@ const Routes = () => {
     }
   };
 
-  console.log({ isLoggedIn, isLoading, profile }, isLoading || !profile?.id);
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -106,6 +107,16 @@ const Routes = () => {
                 name="ChatBox"
                 component={ChatBox}
                 options={{ headerTitle: "Chats" }}
+                // initialParams={{ userData: profile }}
+              />
+
+              <Stack.Screen
+                name="UserChat"
+                component={UserChat}
+                options={({ route }) => ({
+                  headerTitle: props => <UserChatHeader {...props} route={route} />,
+                })}
+                // options={{ headerTitle: "Chats" }}
                 // initialParams={{ userData: profile }}
               />
 

@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { AuthContext } from '../context/UserContext.context';
 import AuthService from '../utils/auth.service';
 import { useNavigation } from '@react-navigation/native';
-import useLocation, { useLocationContext } from '../components/Location.comp';
+import { useLocationContext } from '../components/Location.comp';
 import UserService from '../utils/user.service';
 
 
@@ -73,7 +73,7 @@ const Profile= (props:any) => {
   const navigation = useNavigation();
   const { isLoggedIn,profile,Toast, setIsLoggedIn,setProfile,token } = useContext(AuthContext);  
   const userData = profile
-  const userInformation = userData && [
+  const userInformation = userData  ?  [
     // { key: 'Username', value: userData.username },
     { key: 'Bio', value: userData.bio },
     { key: 'Yob', value: userData.yob },
@@ -85,7 +85,7 @@ const Profile= (props:any) => {
     { key: 'Location', value: userData.location },
     { key: 'Interests', value: userData.interests.join(', ') }, // Join interests for a single string
     { key: 'Languages', value: userData.languages.join(', ') }, // Join languages for a single string
-  ];
+  ] : []
 
   const handleLogout = async()=>{
     await AuthService.logout();

@@ -83,7 +83,6 @@ const RegisterComp = () => {
     try {
       setLoading(true);
       const response = await UserService.registerUser(userDetails);
-      console.log("handleSubmit",response)
       Toast.success(response.result)
       setUserDetails({...userDetails,success:true})
       // Handle successful registration
@@ -103,7 +102,6 @@ const RegisterComp = () => {
       if(otp.isEntered){
         setLoading(true);
         const response = await UserService.registerUser({otp:+(otp.value)});
-        console.log("handleSubmitOtp",response)
         Toast.success('Please login!')
         navigation.navigate("Login");
       }
