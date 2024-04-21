@@ -14,6 +14,7 @@ import RegisterComp from "./Register.comp";
 import ChatBox from "../Screen/Chats.Screen";
 import UserChat from "../Screen/UserChat.Screen";
 import UserChatHeader from "./UserChatHeader.comp";
+import { SocketContext } from "../context/Socket.context";
 
 const Stack = createStackNavigator();
 
@@ -30,10 +31,11 @@ const Routes = () => {
   } = useContext(AuthContext);
   const [errorMsg, setError] = useState<string | null>(null);
 
+  const  {globalSocket} = useContext(SocketContext);
   useEffect(() => {
     retrieveData();
   }, []);
-
+console.log("checkSocket",globalSocket)
   const retrieveData = async () => {
     try {
       //@ts-ignore
@@ -55,6 +57,16 @@ const Routes = () => {
       setLoader(false);
     }
   };
+  
+  useEffect(() => {
+    if (globalSocket && isLoggedIn && profile) {
+      // Emit a custom "user" event with user information
+      globalSocket.emit("user", { userId: String(profile.id) });
+      globalSocket.on("receive-msg", (data:any) => {
+        console.log("receive-msg Socket",data)
+      })
+    }
+  }, [globalSocket]);
 
   if (isLoading) {
     return (
@@ -91,7 +103,7 @@ const Routes = () => {
               <Stack.Screen
                 name="Profile"
                 component={Profile}
-                // initialParams={{ userData: profile }}
+                // initialParams={{ userData: profile }}j
               />
 
               <Stack.Screen

@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { AuthContext, AuthProvider } from "./src/context/UserContext.context";
 import { ToastProvider } from "./src/components/Toaster.comp";
 import Loading from "./src/components/Loading.comp";
 import Routes from "./src/components/Routes.comp";
-import {LocationProvider} from "./src/components/Location.comp";
-import * as Location from 'expo-location';
+import { LocationProvider } from "./src/components/Location.comp";
+import * as Location from "expo-location";
+import { SocketContext, SocketProvider } from "./src/context/Socket.context";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,6 +26,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
 
 export default function App() {
 
@@ -68,16 +70,21 @@ export default function App() {
   //   );
   // }
 
+  const { globalSocket, setGlobalSocket, globalError, setGlobalError } = useContext(SocketContext);
+
+
   return (
     <>
-     <LocationProvider>
-      <AuthProvider>
-        <View style={styles.container}>
-          <Loading>
-            <Routes />
-          </Loading>
-        </View>
-      </AuthProvider>
+      <LocationProvider>
+        <AuthProvider>
+        <SocketProvider>
+            <View style={styles.container}>
+              <Loading>
+                <Routes />
+              </Loading>
+            </View>
+            </SocketProvider>
+        </AuthProvider>
       </LocationProvider>
     </>
   );
