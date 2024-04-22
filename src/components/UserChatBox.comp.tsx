@@ -17,6 +17,7 @@ import React, {
   useState,
 } from "react";
 import { AuthContext } from "../context/UserContext.context";
+import { SocketContext } from "../context/Socket.context";
 
 const styles = StyleSheet.create({
   chatContainer: {
@@ -112,10 +113,41 @@ const UserChatBox = ({ props }) => {
   const [pageConfig, setPageConfig] = useState({ page: 1, limit: 10 });
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const { globalSocket } = useContext(SocketContext);
+
 
   useEffect(() => {
     fetchMessages();
   }, []);
+
+  useEffect(() => {
+    if (globalSocket) {
+      globalSocket.on("receive-msg", (data) => {
+        const senderId = data?.message?.senderId;
+        if (senderId && senderId == receiverId) {
+          // Process the received message for the current chat
+          console.log("Received message for chat with ID:", senderId,data);
+          // You can update the chat messages state here
+          if (data) {
+            console.log("checkmessgaeindex",data.message,messages?.length)
+            //@ts-ignore
+            setMessages((prev)=>[...prev, data.message])
+            // setNewMessage(""); // Clear input field
+            if (listRef.current) {
+              listRef.current.scrollToEnd({ animated: true });
+            }
+          }
+        }
+      });
+    }
+
+    // Clean up the event listener when the component unmounts
+    // return () => {
+    //   if (globalSocket) {
+    //     // globalSocket.off("receive-msg");
+    //   }
+    // };
+  }, [globalSocket, receiverId]);
 
   // useEffect(() => {
   //   console.log("listRef",messages.length);
@@ -198,21 +230,21 @@ const UserChatBox = ({ props }) => {
     }
   };
 
-  const renderMessage = ({ item: message }) => {
-    const isSender = profile.id == message.senderId; // Use state variable for logged-in user
-    const messageStyle = isSender
-      ? styles.rightMessage
-      : styles.messageContainer;
+  // const renderMessage = ({ item: message }) => {
+  //   const isSender = profile.id == message.senderId; // Use state variable for logged-in user
+  //   const messageStyle = isSender
+  //     ? styles.rightMessage
+  //     : styles.messageContainer;
 
-    const formattedDate = getRelativeTime(message.createdDate); // Custom function for relative time
+  //   const formattedDate = getRelativeTime(message.createdDate); // Custom function for relative time
 
-    return (
-      <View style={messageStyle} key={message.id}>
-        <Text style={styles.messageText}>{message.content}</Text>
-        <Text style={styles.messageTimestamp}>{formattedDate}</Text>
-      </View>
-    );
-  };
+  //   return (
+  //     <View style={messageStyle} key={message.id}>
+  //       <Text style={styles.messageText}>{message.content}</Text>
+  //       <Text style={styles.messageTimestamp}>{formattedDate}</Text>
+  //     </View>
+  //   );
+  // };
 
   const ReenderMessage = React.memo(({ item: message }) => {
     const isSender = profile.id == message.senderId;
@@ -268,38 +300,38 @@ return(
 </View>
 
 )
-  return (
-    <View style={styles.chatContainer}>
-      <FlatList
-        ref={listRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
-        style={styles.chatContainer}
-        onEndReachedThreshold={0.1}
-        onEndReached={fetchOlderMessages}
-        inverted contentContainerStyle={{ flexDirection: 'column-reverse' }}
-        // onLayout={() => {
-        //   listRef.current.scrollToEnd({ animated: false });
-        // }}
-      >
-        {/* Render loading indicator while fetching messages */}
-        {messages.length === 0 && (
-          <Text style={styles.loadingText}>Loading messages...</Text>
-        )}
-      </FlatList>
-      <View style={styles.messageInputContainer}>
-        <TextInput
-          style={styles.messageInput}
-          placeholder="Message"
-          value={newMessage}
-          onChangeText={setNewMessage}
-        />
-        {renderSendButton()}
-        {/* <Button title="Send" onPress={sendMessage} disabled={!newMessage.trim()} /> */}
-      </View>
-    </View>
-  );
+  // return (
+  //   <View style={styles.chatContainer}>
+  //     <FlatList
+  //       ref={listRef}
+  //       data={messages}
+  //       renderItem={renderMessage}
+  //       keyExtractor={(item) => item.id}
+  //       style={styles.chatContainer}
+  //       onEndReachedThreshold={0.1}
+  //       onEndReached={fetchOlderMessages}
+  //       inverted contentContainerStyle={{ flexDirection: 'column-reverse' }}
+  //       // onLayout={() => {
+  //       //   listRef.current.scrollToEnd({ animated: false });
+  //       // }}
+  //     >
+  //       {/* Render loading indicator while fetching messages */}
+  //       {messages.length === 0 && (
+  //         <Text style={styles.loadingText}>Loading messages...</Text>
+  //       )}
+  //     </FlatList>
+  //     <View style={styles.messageInputContainer}>
+  //       <TextInput
+  //         style={styles.messageInput}
+  //         placeholder="Message"
+  //         value={newMessage}
+  //         onChangeText={setNewMessage}
+  //       />
+  //       {renderSendButton()}
+  //       {/* <Button title="Send" onPress={sendMessage} disabled={!newMessage.trim()} /> */}
+  //     </View>
+  //   </View>
+  // );
 };
 
 export default UserChatBox;

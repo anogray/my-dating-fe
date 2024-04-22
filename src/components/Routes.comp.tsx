@@ -28,6 +28,7 @@ const Routes = () => {
     Toast,
     profile,
     setToken,
+    token
   } = useContext(AuthContext);
   const [errorMsg, setError] = useState<string | null>(null);
 
@@ -62,11 +63,30 @@ console.log("checkSocket",globalSocket)
     if (globalSocket && isLoggedIn && profile) {
       // Emit a custom "user" event with user information
       globalSocket.emit("user", { userId: String(profile.id) });
-      globalSocket.on("receive-msg", (data:any) => {
-        console.log("receive-msg Socket",data)
+      globalSocket.on("receive-msg", async(data:any) => {
+        // const socketData =JSON.parse(data);
+        // console.log("receive-msg Socket",data,data['message']['senderId'],data.message.senderId)
+        // await passUserNavigate(data.message.senderId)
       })
     }
   }, [globalSocket]);
+
+
+const passUserNavigate=async(id:any)=>{
+  try{
+    console.log("passing",id)
+    const response = await getSocketUserDetails(id);
+    console.log("passUserNavigate",id);
+    
+  }catch(err){
+
+  }
+}
+
+const getSocketUserDetails=async(recipentId:string)=>{
+      const userProfile = await UserService.getUserProfile(token,recipentId)
+      return userProfile;
+}
 
   if (isLoading) {
     return (

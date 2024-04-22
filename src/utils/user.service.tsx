@@ -24,6 +24,24 @@ const UserService = {
     }
   },
 
+  getUserProfile: async (access_token: string, id:string) => {
+    try {
+      const response = await axios.get(`${API_URL}/users/user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      return response.data.result;
+    } catch (err) {
+      // Handle login errors
+      console.error("Error getUserProfile in:", err, err?.response?.data);
+      throw err?.response?.data?.message; // Re-throw for further error handling
+    }
+  },
+
   getProfiles: async (access_token: string) => {
     try {
       console.log("getProfiles", { access_token });
@@ -134,7 +152,6 @@ const UserService = {
 
   userChats: async(access_token: string, page:number=1, limit:number=1)=>{
     try{
-
       const response = await axios.get(`${API_URL}/users/chats`, {
         params: {
           page,
